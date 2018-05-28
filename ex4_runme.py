@@ -26,4 +26,6 @@ def Q5(): # spam data
 
 if __name__ == '__main__':
     # TODO - run your code for questions 3-5
+
+    print(np.exp(3))
     pass
