@@ -31,23 +31,22 @@ class AdaBoost(object):
         Train this classifier over the sample (X,y)
         """
         m = len(X) # I assume X is a list of examples.
-        D = [1/m]*m  #initialize the weights vector
+        D = np.array([1/m for _ in range(m)]).reshape(m, 1)  #initialize the weights vector
 
         for t in range(self.T):
             h = self.WL(D,X,y)
-            h_labels = h.predict(X)
             epsilon_t = self.calculate_epsilon_t(X,y,D,h)
-            w_t = (1/2)*math.log((1/epsilon_t) - 1)
+            w_t = (1/2)* math.log((1/epsilon_t) - 1)
 
             # saving the new predictor
             self.h[t] = h
             self.w[t] = w_t
 
             # updating D_i for iteration t+1
-            for i in range(m):
-                n = D[i] * np.exp(-w_t*y[i] * h_labels[t])
-                d =  sum([D[j] * np.exp(-w_t * y[j] * h_labels[j]) for j in range(m)])
-                D[i] = d/n
+            p = h.predict(X).reshape((-1, 1))
+            d = (D.T).dot(np.exp(-w_t * y * p))[0][0]
+            D = D * np.exp(-w_t * y * p)/(d)
+
 
     def calculate_epsilon_t(self,X,y,D,h):
         """
@@ -59,8 +58,9 @@ class AdaBoost(object):
         #     if not h.predict(X[t]) == y[t]:
         #         epsilon_t += D[t] # D[t]*1 from the psuedo code, it's obvious
         # return epsilon_t
-        return \
-            sum([D[t] if h.predict[X[t]] != y[t] else 0 for t in range(len(X))])
+
+        return np.sum(D * [y!= h.predict(X).reshape(-1,1)])
+
 
     def predict(self, X):
         """
@@ -68,15 +68,14 @@ class AdaBoost(object):
         -------
         y_hat : a prediction vector for X
         """
-        m = len(X)
-        predictions = np.zeros(m)
+        T_pred = [(self.h[i]).predict(X) for i in range(self.T)]
 
-        for i in range(m):
-            sum = 0
-            for t in range(self.T):
-                sum += self.w[t] * self.h[t].predict(X[i])
-            predictions[i] = np.sign(sum)
-        return predictions
+        res = np.zeros(len(X)).reshape(len(X),1)
+        for i in range(len(X)):
+                for t in range(self.T):
+                    res += self.w[t] * T_pred[t][i]
+        return np.sign(res)
+
 
     def error(self, X, y):
         """
@@ -89,3 +88,4 @@ class AdaBoost(object):
 
         res = self.predict(X)
         return sum([1 if y[i] == res[i] else 0 for i in range(len(y))])
+
