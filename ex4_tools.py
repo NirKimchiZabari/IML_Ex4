@@ -11,7 +11,6 @@ See https://pypi.python.org/pypi/graphviz for more details.
 Author: Noga Zaslavsky
 
 """
-import sklearn
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap

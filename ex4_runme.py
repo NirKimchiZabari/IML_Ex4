@@ -18,7 +18,7 @@ import ex4_tools
 def getSynData():
     files = ["X_test.txt", "X_train.txt","X_val.txt", "y_test.txt",
              "y_train.txt", "y_val.txt"]
-    return [ps.read_csv("SynData/"+ file,header=None,delim_whitespace=True).values for file in files]
+    return [ps.read_csv("SynData/" + file, header=None,delim_whitespace=True).values for file in files]
 
 
 def getAccuracy(p, t_labels):
@@ -28,9 +28,12 @@ def getAccuracy(p, t_labels):
     n_err = np.sum(p==t_labels)
     return n_err/m
 
-def graph_plot(x_desc,y_desc,x,y_1,y_1_desc,y_2,y_2_desc,title):
+def graph_plot(x_desc,y_desc,x,y_1,y_1_desc,y_2,y_2_desc,title,y_3 = None,y_3_desc = None):
     plt.plot(x,y_1,linewidth = 1.5,label=y_1_desc,color = 'r')
     plt.plot(x,y_2,linewidth = 1.5,label=y_2_desc,color = 'g')
+    if y_3 != None:
+        plt.plot(x,y_3,linewidth = 1.5,label=y_3_desc,color = 'k')
+
     plt.title(title)
     plt.xlabel(x_desc)
     plt.ylabel(y_desc)
@@ -43,24 +46,22 @@ def Q3(): # AdaBoost
     X_test,X_train,X_val = syn_data[0],syn_data[1],syn_data[2]
     Y_test,Y_train,Y_val = syn_data[3],syn_data[4],syn_data[5]
 
-    T = [5*(i+1) for i in range(20)] + [200]
+    T = [5*(i+1) for i in range(39)] + [200]
     # the error is in percentage, will be: total mistakes/total samples
-    training_err, validation_err = list(), list()
+    test_err, validation_err = list(), list()
+    training_err = list()
 
-    PPP = list()
     for t in T:
         AdaB = adaboost.AdaBoost(ex4_tools.DecisionStump,t)
         AdaB.train(X_train,Y_train)
 
-        # predict_test = AdaB.predict(X_test)
-        # predict_val = AdaB.predict(X_val)
-        # PPP.append(predict_test)
+        test_err.append(AdaB.error(X_test,Y_test))
+        validation_err.append(AdaB.error(X_val,Y_val))
+        training_err.append(AdaB.error(X_train,Y_train))
 
-        training_err.append(AdaB.error(X_test,Y_test)/len(X_test))
-        validation_err.append(AdaB.error(X_val,Y_val)/len(X_val))
 
-    graph_plot("T","error of adaBoost",T,training_err,
-               "training err", validation_err,"validation err","Q3")
+    graph_plot("T","error of adaBoost",T,test_err,
+               "test err", validation_err,"validation err","Q3",training_err,"training err")
 
     return
 

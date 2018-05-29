@@ -36,7 +36,7 @@ class AdaBoost(object):
         for t in range(self.T):
             h = self.WL(D,X,y)
             epsilon_t = self.calculate_epsilon_t(X,y,D,h)
-            w_t = (1/2)* math.log((1/epsilon_t) - 1)
+            w_t =  math.log((1/epsilon_t) - 1)/2
 
             # saving the new predictor
             self.h[t] = h
@@ -53,13 +53,7 @@ class AdaBoost(object):
         calculate epsilon_t from the algorithm, where X is the samples, y
         is the true labels, D is the weights vector, and h is the weak learner.
         """
-        # epsilon_t = 0
-        # for t in range(len(X)):
-        #     if not h.predict(X[t]) == y[t]:
-        #         epsilon_t += D[t] # D[t]*1 from the psuedo code, it's obvious
-        # return epsilon_t
-
-        return np.sum(D * [y!= h.predict(X).reshape(-1,1)])
+        return np.sum(D * [y != h.predict(X).reshape(-1,1)])
 
 
     def predict(self, X):
@@ -68,12 +62,13 @@ class AdaBoost(object):
         -------
         y_hat : a prediction vector for X
         """
-        T_pred = [(self.h[i]).predict(X) for i in range(self.T)]
+        T_pred = np.array([(self.h[i]).predict(X) for i in range(self.T)])
 
         res = np.zeros(len(X)).reshape(len(X),1)
-        for i in range(len(X)):
+        for i_sample in range(len(X)):
                 for t in range(self.T):
-                    res += self.w[t] * T_pred[t][i]
+                    res[i_sample] += self.w[t] * T_pred[t][i_sample]
+
         return np.sign(res)
 
 
@@ -85,7 +80,5 @@ class AdaBoost(object):
         """
         if len(X) != len(y):
             raise Exception("Different number of labels and samples")
-
         res = self.predict(X)
-        return sum([1 if y[i] == res[i] else 0 for i in range(len(y))])
-
+        return (np.logical_not(res==y).sum())/len(y)
