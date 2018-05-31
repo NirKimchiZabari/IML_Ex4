@@ -11,6 +11,7 @@ See https://pypi.python.org/pypi/graphviz for more details.
 Author: Noga Zaslavsky
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -40,11 +41,7 @@ class DecisionStump(object):
         F, J, theta = [0]*2, [0]*2, [0]*2
         for b in [0,1]:
             s = 2*b - 1
-            theta[b], J[b] = X[:,0].min()-1, 0
-
-
-            F[b] = D[y==s].sum()
-
+            F[b], theta[b], J[b] = D[y==s].sum(), X[:,0].min()-1, 0
             for j in range(d):  # go over all features
                 ind = np.argsort(X[:, j])
                 Xj = np.sort(X[:, j])  # sort by coordinate j

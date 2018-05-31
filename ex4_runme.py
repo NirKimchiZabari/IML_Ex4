@@ -18,15 +18,7 @@ import ex4_tools
 def getSynData():
     files = ["X_test.txt", "X_train.txt","X_val.txt", "y_test.txt",
              "y_train.txt", "y_val.txt"]
-    return [ps.read_csv("SynData/" + file, header=None,delim_whitespace=True).values for file in files]
-
-
-def getAccuracy(p, t_labels):
-    if len(p) != len(t_labels):
-        raise Exception("different number.")
-    m = len(p)
-    n_err = np.sum(p==t_labels)
-    return n_err/m
+    return [np.loadtxt("SynData/" + file) for file in files]
 
 def graph_plot(x_desc,y_desc,x,y_1,y_1_desc,y_2,y_2_desc,title,y_3 = None,y_3_desc = None):
     plt.plot(x,y_1,linewidth = 1.5,label=y_1_desc,color = 'r')
@@ -44,12 +36,14 @@ def Q3(): # AdaBoost
     # Get the data
     syn_data = getSynData()
     X_test,X_train,X_val = syn_data[0],syn_data[1],syn_data[2]
-    Y_test,Y_train,Y_val = syn_data[3],syn_data[4],syn_data[5]
+    Y_test,Y_train,Y_val = syn_data[3] ,syn_data[4] ,syn_data[5]
 
-    T = [5*(i+1) for i in range(39)] + [200]
+    T = [5*(i+1) for i in range(20)] + [200]
+
     # the error is in percentage, will be: total mistakes/total samples
     test_err, validation_err = list(), list()
     training_err = list()
+
 
     for t in T:
         AdaB = adaboost.AdaBoost(ex4_tools.DecisionStump,t)
@@ -59,10 +53,11 @@ def Q3(): # AdaBoost
         validation_err.append(AdaB.error(X_val,Y_val))
         training_err.append(AdaB.error(X_train,Y_train))
 
+        # ex4_tools.decision_boundaries(AdaB,X_train,Y_train,"t:" + str(t) )
 
     graph_plot("T","error of adaBoost",T,test_err,
                "test err", validation_err,"validation err","Q3",training_err,"training err")
-
+    #
     return
 
 def Q4(): # decision trees
@@ -73,8 +68,6 @@ def Q5(): # spam data
     # TODO - implement this function
     return
 
-def test():
-    return [1,2]
 
 if __name__ == '__main__':
     # TODO - run your code for questions 3-5
