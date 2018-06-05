@@ -15,8 +15,9 @@ Author: Noga Zaslavsky
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-# from graphviz import Digraph # TODO - comment out if you didn't install graphviz
-
+from graphviz import Digraph
+import os
+os.environ["PATH"] += os.pathsep + 'D:/Program Files (x86)/Graphviz2.38/bin/'
 
 class DecisionStump(object):
     """
@@ -145,8 +146,7 @@ def view_dtree(dtree, feature_names = None, class_names=None, filename='dtree'):
                    feature_str = feature_names[node.feature]
                 else:
                     feature_str = 'X[%d'%node.feature + ']'
-                return feature_str +' < %0.2f'%node.theta + '?\ninfo-gain = %0.2f'\
-                      %node.gain +'\nsamples = %d'%+node.samples
+                return feature_str +' < %0.2f'%node.theta + '\nsamples = %d'%+node.samples
 
         def build_dot(dot,node,path):
             if node.leaf:

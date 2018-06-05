@@ -11,9 +11,9 @@ Date: May, 2018
 import matplotlib.pyplot as plt
 import numpy as np
 import adaboost
-import pandas as ps
-
+import decision_tree
 import ex4_tools
+from datetime import datetime
 
 def getSynData():
     files = ["X_test.txt", "X_train.txt","X_val.txt", "y_test.txt",
@@ -33,17 +33,12 @@ def graph_plot(x_desc,y_desc,x,y_1,y_1_desc,y_2,y_2_desc,title,y_3 = None,y_3_de
     plt.show()
 
 def Q3(): # AdaBoost
-    # Get the data
     syn_data = getSynData()
     X_test,X_train,X_val = syn_data[0],syn_data[1],syn_data[2]
     Y_test,Y_train,Y_val = syn_data[3] ,syn_data[4] ,syn_data[5]
 
     T = [5*(i+1) for i in range(20)] + [200]
-
-    # the error is in percentage, will be: total mistakes/total samples
     test_err, validation_err = list(), list()
-    training_err = list()
-
 
     for t in T:
         AdaB = adaboost.AdaBoost(ex4_tools.DecisionStump,t)
@@ -51,37 +46,51 @@ def Q3(): # AdaBoost
 
         test_err.append(AdaB.error(X_test,Y_test))
         validation_err.append(AdaB.error(X_val,Y_val))
-        training_err.append(AdaB.error(X_train,Y_train))
-
-        # ex4_tools.decision_boundaries(AdaB,X_train,Y_train,"t:" + str(t) )
 
     graph_plot("T","error of adaBoost",T,test_err,
-               "test err", validation_err,"validation err","Q3",training_err,"training err")
+               "test err", validation_err,"validation err","Q3")
     #
     return
 
 def Q4(): # decision trees
-    # TODO - implement this function
+    syn_data = getSynData()
+    X_test, X_train, X_val = syn_data[0], syn_data[1], syn_data[2]
+    Y_test, Y_train, Y_val = syn_data[3], syn_data[4], syn_data[5]
+    # D = [3, 6, 8, 10, 12]
+    test_err, validation_err = list(), list()
+    D = [3]
+
+    DT = decision_tree.DecisionTree(3)
+    DT.root = decision_tree.Node()
+    DT.root.theta = 3
+    DT.root.feature = 3
+
+
+    for d in D:
+        DT = decision_tree.DecisionTree(d)
+        DT.train(X_train,Y_train)
+        # ex4_tools.decision_boundaries()
+
+        time = str(datetime.now().strftime('%Y-%m-%d%H.%M.%S'))
+
+        ex4_tools.view_dtree(DT,filename=time)
+
+        test_err.append(DT.error(X_test,Y_test))
+        validation_err.append(DT.error(X_val,Y_val))
+
     return
 
 def Q5(): # spam data
     # TODO - implement this function
     return
 
+def polygon_approxtimation(Points):
+    sum = 0
+    for i in range(len(Points)-1):
+        sum += Points[i][0] * Points[i+1][1] - Points[i][1] * Points[i+1][0]
+    return sum/2
 
 if __name__ == '__main__':
-    # TODO - run your code for questions 3-5
-    Q3()
-
-
-    # D = np.array([1/10.0 for i in range(10)])
-    # X = np.array([[1,0] for i in range(10)])
-    # y = np.array([1 for i in range(10)])
-	#
-	# test = ex4_tools.DecisionStump(D,X,y)
-	# print(test.predict([1,0]))
-
-
-# data =parse_file("SynData/y_test.txt")
-# for i in range(len(data)):
-#     print("i: ", i, "res: ",data[i])
+    # Q3()
+    Q4()
+    # Q5()
