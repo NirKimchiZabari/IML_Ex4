@@ -24,23 +24,20 @@ class Bagging(object):
         self.h = [None]*B     # list of base learners
         self.m = 0
 
-    def draw_points(self, X):
-        pass
-        #todo :draw points func
+    def draw_points(self, X,y):
+        # Bagging is with replacements
+        # we define to sample 0.75*(given_sample_size) as a hyperparameter as well
+        inds_vault = np.random.choice(len(X), int(len(X)*0.75), replace=True)
+        return X[inds_vault], y[inds_vault]
 
     def train(self, X, y):
         """
         Train this classifier over the sample (X,y)
         """
         # We define m as a constant.
-        if len(X) < 3:
-            self.m = 1
-        else:
-            self.m = int(np.math.ceil(len(X)))
-
         for i in range(self.B):
-            sampled_X,sampled_y= self.draw_points(X)
-            L = self.L(10) #depth of the trees is 10
+            sampled_X,sampled_y= self.draw_points(X,y)
+            L = self.L(10) # depth of the trees is 10 - hyperparameter as mentiond in the forum
             L.train(sampled_X,sampled_y)
             self.h[i] = L
 
@@ -51,13 +48,20 @@ class Bagging(object):
         -------
         y_hat : a prediction vector for X
         """
-        predictions = [self.h[i].predict(X) for i in range(self.B)]
-        sum = [0] * len(X)
-        for i in range(len(X)):
-            for j in range(self.B):
-                sum+=predictions[j][i]
-        return [1 if sum[i] >=0 else -1 for i in range(len(X))]
-
+        if self.B == 1:
+            return self.h[0].predict(X)
+        else:
+            predictions = [self.h[i].predict(X) for i in range(self.B)]
+            res = np.array([0] * len(X))
+            for i in range(len(X)):
+                val = 0
+                for b in range(self.B):
+                    val +=predictions[b][i]
+                if val >=0:
+                    res[i] = 1
+                else:
+                    res[i] = -1
+            return res
 
     def error(self, X, y):
         """
@@ -66,4 +70,4 @@ class Bagging(object):
         the error of this classifier over the sample (X,y)
         """
         ans = self.predict(X)
-        return np.sum(np.logical_not(np.equal(ans, y))) / len(X)
+        return np.sum(np.logical_not(y==ans)) / len(X)

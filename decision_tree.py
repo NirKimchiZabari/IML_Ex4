@@ -2,13 +2,10 @@
 ===================================================
      Introduction to Machine Learning (67577)
 ===================================================
-
 Skeleton for the decision tree classifier with real-values features.
 Training algorithm: CART
-
 Author: Noga Zaslavsky
 Edited: Yoav Wald, May 2018
-
 """
 import numpy as np
 import ex4_tools
@@ -80,13 +77,11 @@ class DecisionTree(object):
     def CART(self,X, y, A, depth):
         """
         Gorw a decision tree with the CART method ()
-
         Parameters
         ----------
         X, y : sample
         A : array of d*m real features, A[j,:] row corresponds to thresholds over x_j
         depth : current depth of the tree
-
         Returns
         -------
         node : an instance of the class Node (can be either a root of a subtree or a leaf)
