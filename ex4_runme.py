@@ -56,10 +56,11 @@ def Q4(): # decision trees
     syn_data = getSynData()
     X_test, X_train, X_val = syn_data[0], syn_data[1], syn_data[2]
     Y_test, Y_train, Y_val = syn_data[3], syn_data[4], syn_data[5]
-    # D = [3, 6, 8, 10, 12]
+    # D = [1,3, 6, 8, 10, 12]
+    D = [i*6 for i in range(2,10)]
     test_err, validation_err = list(), list()
-    D = [3]
-
+    # D = [1,2,3,4,5,6]
+    # D = [4]
     DT = decision_tree.DecisionTree(3)
     DT.root = decision_tree.Node()
     DT.root.theta = 3
@@ -69,26 +70,24 @@ def Q4(): # decision trees
     for d in D:
         DT = decision_tree.DecisionTree(d)
         DT.train(X_train,Y_train)
-        # ex4_tools.decision_boundaries()
-
-        time = str(datetime.now().strftime('%Y-%m-%d%H.%M.%S'))
-
-        ex4_tools.view_dtree(DT,filename=time)
+        ex4_tools.decision_boundaries(DT,X_train,Y_train,"decision tree, d: "+ str(d))
+        # DT.train(X_train[0:10],Y_train[0:10])
+        # ex4_tools.decision_boundaries(DT,X_train[0:10]+X_train[0],Y_train[0:10]+Y_train[0],str(D[0]))
 
         test_err.append(DT.error(X_test,Y_test))
         validation_err.append(DT.error(X_val,Y_val))
 
+
+        # time = str(datetime.now().strftime('%Y-%m-%d%H.%M.%S'))
+        # ex4_tools.view_dtree(DT, filename=time)
+
+    graph_plot("D","decision trees",D,test_err,
+               "test err", validation_err,"validation err","Q4")
     return
 
 def Q5(): # spam data
-    # TODO - implement this function
-    return
 
-def polygon_approxtimation(Points):
-    sum = 0
-    for i in range(len(Points)-1):
-        sum += Points[i][0] * Points[i+1][1] - Points[i][1] * Points[i+1][0]
-    return sum/2
+    return
 
 if __name__ == '__main__':
     # Q3()
